@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trang Quản Trị Admin - Duyệt Rút Tiền</title>
+    <style>
+        * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+        body { background-color: #f8fafc; margin: 0; padding: 25px; }
+        .container { max-width: 900px; margin: auto; background: white; border-radius: 12px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #e2e8f0; padding-bottom: 15px; margin-bottom: 20px; }
+        h1 { margin: 0; font-size: 22px; color: #0f172a; }
+        .btn-refresh { padding: 8px 16px; background: #0ea5e9; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { padding: 12px 14px; text-align: left; border-bottom: 1px solid #e2e8f0; font-size: 14px; }
+        th { background: #f1f5f9; color: #475569; font-weight: 700; }
+        
+        .badge { padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 700; display: inline-block; }
+        .badge-pending { background: #fef3c7; color: #d97706; }
+        .badge-completed { background: #dcfce7; color: #15803d; }
+        
+        .btn-pay { background: #16a34a; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; }
+        .btn-pay:hover { background: #15803d; }
+        .empty-msg { text-align: center; color: #94a3b8; padding: 30px; font-size: 15px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1>👑 BẢNG ĐIỀU KHIỂN ADMIN</h1>
+                <p style="margin: 5px 0 0 0; color: #64748b; font-size: 14px;">Quản lý và duyệt chuyển tiền cho thợ cày nhiệm vụ</p>
+            </div>
+            <button class="btn-refresh" onclick="loadWithdrawals()">🔄 Làm mới</button>
+        </div>
+
+        <h3>Danh Sách Lệnh Rút Tiền:</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Thời gian</th>
+                    <th>Tài khoản</th>
+                    <th>Hình thức</th>
+                    <th>Số tài khoản / MoMo</th>
+                    <th>Tên người nhận</th>
+                    <th>Số tiền</th>
+                    <th>Trạng thái</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody id="table-body">
+                <tr><td colspan="8" class="empty-msg">Đang tải dữ liệu...</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        async function loadWithdrawals() {
+            try {
+                const res = await fetch('/api/admin/withdrawals');
+                const data = await res.json();
+                const tbody = document.getElementById('table-body');
+                tbody.innerHTML = '';
+
+                if (!data.withdrawals || data.withdrawals.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="8" class="empty-msg">Chưa có ai gửi yêu cầu rút tiền.</td></tr>';
+                    return;
+                }
+
+                data.withdrawals.forEach(w => {
+                    const tr = document.createElement('tr');
+                    const isPending = w.status === 'PENDING';
+
+                    tr.innerHTML = `
+                        <td style="font-size: 12px; color: #64748b;">${w.time}</td>
+                        <td><b>${w.userId}</b></td>
+                        <td><b>${w.method}</b></td>
+                        <td style="color: #2563eb; font-weight: 700; font-family: monospace; font-size: 15px;">${w.accountNumber}</td>
+                        <td style="text-transform: uppercase;"><b>${w.accountName}</b></td>
+                        <td style="color: #dc2626; font-weight: bold; font-size: 15px;">${w.amount.toLocaleString()} đ</td>
+                        <td>
+                            <span class="badge ${isPending ? 'badge-pending' : 'badge-completed'}">
+                                ${isPending ? '⏳ Chờ Chuyển Tiền' : '✅ Đã Chuyển Tiền'}
+                            </span>
+                        </td>
+                        <td>
+                            ${isPending ? `<button class="btn-pay" onclick="approveWithdraw('${w.id}')">Đã Chuyển Tiền Xong</button>` : '✔️ Hoàn tất'}
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        async function approveWithdraw(id) {
+            if (!confirm("Bạn đã mở MoMo/Ngân hàng và chuyển tiền cho họ rồi đúng không?")) return;
+
+            try {
+                const res = await fetch('/api/admin/approve', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id })
+                });
+                const data = await res.json();
+                alert(data.message);
+                loadWithdrawals();
+            } catch (err) {
+                alert("Lỗi khi cập nhật!");
+            }
+        }
+
+        // Tự động tải danh sách khi mở trang
+        loadWithdrawals();
+        // Cứ 15 giây tự làm mới 1 lần
+        setInterval(loadWithdrawals, 15000);
+    </script>
+</body>
+</html>
