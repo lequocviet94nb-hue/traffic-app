@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Website Khách Hàng Cần SEO</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 40px; max-width: 600px; margin: auto; line-height: 1.6; }
+        .box { border: 2px dashed #007bff; padding: 20px; text-align: center; border-radius: 8px; background: #eef6ff; }
+        #timer { font-size: 24px; color: red; font-weight: bold; }
+        #btn-get { display: none; padding: 12px 24px; background: #28a745; color: white; border: none; border-radius: 5px; font-size: 18px; cursor: pointer; font-weight: bold; }
+        #result { margin-top: 15px; font-size: 26px; font-weight: bold; color: #d63384; }
+    </style>
+</head>
+<body>
+    <h1>Bài viết: Dịch Vụ May Đồng Phục Uy Tín Nhất 2026</h1>
+    <p>Chào mừng bạn đã đến với bài viết của chúng tôi. Hãy cuộn xuống để đọc nội dung...</p>
+    <p>Đây là website của khách hàng thuê bạn chạy traffic đẩy top Google.</p>
+
+    <div class="box">
+        <p>Cuộn xuống đọc bài và đợi đồng hồ chạy hết để lấy mã thưởng:</p>
+        <div id="timer">Chờ: 10 giây</div>
+        <button id="btn-get" onclick="getCode()">BẤM ĐỂ LẤY MÃ</button>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        let timeLeft = 10; // Đặt thử nghiệm 10 giây cho nhanh
+        let timer = setInterval(() => {
+            timeLeft--;
+            document.getElementById('timer').innerText = `Chờ: ${timeLeft} giây`;
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                document.getElementById('timer').style.display = 'none';
+                document.getElementById('btn-get').style.display = 'inline-block';
+            }
+        }, 1000);
+
+        async function getCode() {
+            let res = await fetch('/api/get-code', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ campaignId: "SEO_DONGPHUC" })
+            });
+            let data = await res.json();
+            if (data.code) {
+                document.getElementById('result').innerText = data.code;
+                document.getElementById('btn-get').style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App Kiếm Tiền Nhiệm Vụ SEO</title>
+    <style>
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #f0f2f5; margin: 0; padding: 20px; display: flex; justify-content: center; }
+        .app-container { width: 100%; max-width: 420px; background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .header { text-align: center; border-bottom: 2px solid #f0f2f5; padding-bottom: 15px; margin-bottom: 15px; }
+        .header h2 { margin: 0; color: #1a73e8; }
+        .user-info { display: flex; justify-content: space-between; margin-top: 10px; font-size: 14px; color: #555; }
+        .balance-box { background: #e8f5e9; border: 1px solid #c8e6c9; border-radius: 8px; padding: 15px; text-align: center; margin-bottom: 20px; }
+        .balance-title { margin: 0; font-size: 14px; color: #2e7d32; }
+        .balance-amount { margin: 5px 0 0 0; font-size: 28px; font-weight: bold; color: #1b5e20; }
+        .task-card { background: #fff8e1; border-left: 4px solid #ffb300; padding: 15px; border-radius: 4px; margin-bottom: 20px; font-size: 14px; line-height: 1.6; }
+        .task-card b { color: #d84315; }
+        .task-step { margin: 5px 0; }
+        code { background: #eee; padding: 2px 6px; border-radius: 4px; font-weight: bold; color: #d63384; }
+        input[type="text"] { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 6px; font-size: 16px; margin-bottom: 12px; outline: none; }
+        input[type="text"]:focus { border-color: #1a73e8; }
+        button.btn-submit { width: 100%; padding: 12px; background: #1a73e8; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; }
+        button.btn-submit:hover { background: #1557b0; }
+        #message { margin-top: 15px; text-align: center; font-weight: bold; font-size: 15px; }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <div class="header">
+            <h2>NHIỆM VỤ TRAFFIC</h2>
+            <div class="user-info">
+                <span>Tài khoản: <b id="user-id">user1</b></span>
+                <span>Cấp độ: <b>Thành viên</b></span>
+            </div>
+        </div>
+
+        <div class="balance-box">
+            <p class="balance-title">SỐ DƯ HIỆN TẠI</p>
+            <p class="balance-amount"><span id="balance">0</span> đ</p>
+        </div>
+
+        <div class="task-card">
+            <b>👉 Hướng dẫn làm nhiệm vụ:</b>
+            <div class="task-step"><b>Bước 1:</b> Mở Google tìm: <code>dịch vụ seo uy tín</code></div>
+            <div class="task-step"><b>Bước 2:</b> Tìm và bấm vào web: <code>seotop...vn</code></div>
+            <div class="task-step"><b>Bước 3:</b> Cuộn xuống chân trang, đợi 60s để nhận mã.</div>
+        </div>
+
+        <label style="font-weight: bold; font-size: 14px; display: block; margin-bottom: 6px;">Nhập mã nhận được từ website:</label>
+        <input type="text" id="input-code" placeholder="Ví dụ: PASS839201">
+        <button class="btn-submit" onclick="submitTask()">XÁC NHẬN (+300đ)</button>
+
+        <div id="message"></div>
+    </div>
+
+    <script>
+        async function submitTask() {
+            const codeInput = document.getElementById('input-code');
+            const code = codeInput.value.trim();
+            const userId = document.getElementById('user-id').innerText;
+            const msgEl = document.getElementById('message');
+
+            if (!code) {
+                msgEl.innerText = "Vui lòng nhập mã trước khi bấm xác nhận!";
+                msgEl.style.color = "red";
+                return;
+            }
+
+            msgEl.innerText = "Đang kiểm tra mã...";
+            msgEl.style.color = "#555";
+
+            try {
+                const response = await fetch('/api/submit-code', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId, code })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    msgEl.innerText = data.message;
+                    msgEl.style.color = "green";
+                    document.getElementById('balance').innerText = data.newBalance;
+                    codeInput.value = '';
+                } else {
+                    msgEl.innerText = data.message;
+                    msgEl.style.color = "red";
+                }
+            } catch (err) {
+                msgEl.innerText = "Lỗi kết nối máy chủ!";
+                msgEl.style.color = "red";
+            }
+        }
+    </script>
+</body>
+</html>
