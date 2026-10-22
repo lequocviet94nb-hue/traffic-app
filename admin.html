@@ -3,18 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trang Quản Trị Admin - Duyệt Rút Tiền</title>
+    <title>Trang Quản Trị Admin - Bảo Mật</title>
     <style>
-        * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
-        body { background-color: #f8fafc; margin: 0; padding: 25px; }
-        .container { max-width: 900px; margin: auto; background: white; border-radius: 12px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: #f1f5f9; margin: 0; padding: 20px; }
+        .container { max-width: 950px; margin: auto; background: white; border-radius: 12px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.06); }
         .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #e2e8f0; padding-bottom: 15px; margin-bottom: 20px; }
         h1 { margin: 0; font-size: 22px; color: #0f172a; }
-        .btn-refresh { padding: 8px 16px; background: #0ea5e9; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        
+        /* Khung đăng nhập mật khẩu */
+        #login-box { text-align: center; padding: 40px 20px; }
+        #login-box input { padding: 12px; border: 2px solid #cbd5e1; border-radius: 6px; font-size: 16px; width: 250px; outline: none; }
+        #login-box button { padding: 12px 20px; background: #0f172a; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        
+        #admin-panel { display: none; }
+        .btn-refresh { padding: 8px 16px; background: #0284c7; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
         
         table { width: 100%; border-collapse: collapse; margin-top: 15px; }
         th, td { padding: 12px 14px; text-align: left; border-bottom: 1px solid #e2e8f0; font-size: 14px; }
-        th { background: #f1f5f9; color: #475569; font-weight: 700; }
+        th { background: #f8fafc; color: #475569; font-weight: 700; }
         
         .badge { padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 700; display: inline-block; }
         .badge-pending { background: #fef3c7; color: #d97706; }
@@ -28,39 +35,75 @@
 <body>
 
     <div class="container">
-        <div class="header">
-            <div>
-                <h1>👑 BẢNG ĐIỀU KHIỂN ADMIN</h1>
-                <p style="margin: 5px 0 0 0; color: #64748b; font-size: 14px;">Quản lý và duyệt chuyển tiền cho thợ cày nhiệm vụ</p>
-            </div>
-            <button class="btn-refresh" onclick="loadWithdrawals()">🔄 Làm mới</button>
+        <!-- KHUNG KHÓA BẢO MẬT ADMIN (CHỐNG NGƯỜI LẠ VÀO DUYỆT TIỀN) -->
+        <div id="login-box">
+            <h2>🔒 KHÓA BẢO MẬT TRANG ADMIN</h2>
+            <p style="color: #64748b;">Vui lòng nhập mật khẩu quản trị để xem danh sách rút tiền:</p>
+            <input type="password" id="admin-pass" placeholder="Mật khẩu mặc định: admin123">
+            <button onclick="loginAdmin()">MỞ KHÓA</button>
+            <p id="err-msg" style="color: red; font-weight: bold; margin-top: 10px;"></p>
         </div>
 
-        <h3>Danh Sách Lệnh Rút Tiền:</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Thời gian</th>
-                    <th>Tài khoản</th>
-                    <th>Hình thức</th>
-                    <th>Số tài khoản / MoMo</th>
-                    <th>Tên người nhận</th>
-                    <th>Số tiền</th>
-                    <th>Trạng thái</th>
-                    <th>Thao tác</th>
-                </tr>
-            </thead>
-            <tbody id="table-body">
-                <tr><td colspan="8" class="empty-msg">Đang tải dữ liệu...</td></tr>
-            </tbody>
-        </table>
+        <!-- BẢNG ĐIỀU KHIỂN SAU KHI ĐĂNG NHẬP THÀNH CÔNG -->
+        <div id="admin-panel">
+            <div class="header">
+                <div>
+                    <h1>👑 BẢNG QUẢN TRỊ ADMIN (ĐÃ BẢO MẬT)</h1>
+                    <p style="margin: 5px 0 0 0; color: #64748b; font-size: 14px;">Quản lý và duyệt tiền cho thợ cày nhiệm vụ</p>
+                </div>
+                <button class="btn-refresh" onclick="loadWithdrawals()">🔄 Làm mới</button>
+            </div>
+
+            <h3>Danh Sách Lệnh Rút Tiền:</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Thời gian</th>
+                        <th>ID Thợ Cày</th>
+                        <th>Hình thức</th>
+                        <th>Số TK / MoMo</th>
+                        <th>Tên người nhận</th>
+                        <th>Số tiền</th>
+                        <th>Trạng thái</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body">
+                    <tr><td colspan="8" class="empty-msg">Đang tải dữ liệu...</td></tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <script>
-        async function loadWithdrawals() {
+        let currentPassword = '';
+
+        function loginAdmin() {
+            const pass = document.getElementById('admin-pass').value.trim();
+            if (!pass) return;
+            currentPassword = pass;
+            loadWithdrawals(true);
+        }
+
+        async function loadWithdrawals(isFirstTime = false) {
             try {
-                const res = await fetch('/api/admin/withdrawals');
+                const res = await fetch('/api/admin/withdrawals', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password: currentPassword })
+                });
+
                 const data = await res.json();
+
+                if (!data.success) {
+                    document.getElementById('err-msg').innerText = "Sai mật khẩu Admin!";
+                    return;
+                }
+
+                // Đúng mật khẩu -> Hiện bảng
+                document.getElementById('login-box').style.display = 'none';
+                document.getElementById('admin-panel').style.display = 'block';
+
                 const tbody = document.getElementById('table-body');
                 tbody.innerHTML = '';
 
@@ -97,13 +140,13 @@
         }
 
         async function approveWithdraw(id) {
-            if (!confirm("Bạn đã mở MoMo/Ngân hàng và chuyển tiền cho họ rồi đúng không?")) return;
+            if (!confirm("Bạn đã mở app MoMo/Ngân hàng bắn tiền cho họ rồi đúng không?")) return;
 
             try {
                 const res = await fetch('/api/admin/approve', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ id })
+                    body: JSON.stringify({ password: currentPassword, id })
                 });
                 const data = await res.json();
                 alert(data.message);
@@ -112,11 +155,6 @@
                 alert("Lỗi khi cập nhật!");
             }
         }
-
-        // Tự động tải danh sách khi mở trang
-        loadWithdrawals();
-        // Cứ 15 giây tự làm mới 1 lần
-        setInterval(loadWithdrawals, 15000);
     </script>
 </body>
 </html>

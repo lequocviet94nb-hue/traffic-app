@@ -5,40 +5,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>App Kiếm Tiền Nhiệm Vụ SEO</title>
     <style>
-        * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         body { background-color: #f0f2f5; margin: 0; padding: 15px; display: flex; justify-content: center; }
         .app-container { width: 100%; max-width: 440px; background: white; border-radius: 16px; padding: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
         .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #edf2f7; padding-bottom: 12px; margin-bottom: 15px; }
         .header h2 { margin: 0; font-size: 20px; color: #1a73e8; font-weight: 800; }
         .user-pill { background: #e8f0fe; color: #1967d2; padding: 4px 10px; border-radius: 20px; font-size: 13px; font-weight: 600; }
         
-        /* Box Số dư */
-        .balance-box { background: linear-gradient(135deg, #1b5e20, #2e7d32); color: white; border-radius: 12px; padding: 18px; text-align: center; margin-bottom: 16px; position: relative; }
-        .balance-title { margin: 0; font-size: 13px; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.5px; }
+        .balance-box { background: linear-gradient(135deg, #1b5e20, #2e7d32); color: white; border-radius: 12px; padding: 18px; text-align: center; margin-bottom: 16px; }
+        .balance-title { margin: 0; font-size: 13px; opacity: 0.9; text-transform: uppercase; }
         .balance-amount { margin: 6px 0 12px 0; font-size: 32px; font-weight: 800; }
-        .btn-withdraw-toggle { background: #ffd54f; color: #212121; border: none; padding: 8px 18px; border-radius: 20px; font-size: 14px; font-weight: 700; cursor: pointer; transition: 0.2s; box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
+        .btn-withdraw-toggle { background: #ffd54f; color: #212121; border: none; padding: 8px 18px; border-radius: 20px; font-size: 14px; font-weight: 700; cursor: pointer; }
         .btn-withdraw-toggle:hover { background: #ffca28; }
 
-        /* Form Rút tiền (Ẩn/Hiện) */
-        .withdraw-form { display: none; background: #fffde7; border: 1.5px solid #ffe082; border-radius: 10px; padding: 16px; margin-bottom: 18px; animation: slideDown 0.25s ease; }
-        @keyframes slideDown { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+        .withdraw-form { display: none; background: #fffde7; border: 1.5px solid #ffe082; border-radius: 10px; padding: 16px; margin-bottom: 18px; }
         .withdraw-form h4 { margin: 0 0 12px 0; color: #d84315; font-size: 16px; }
         .form-group { margin-bottom: 10px; text-align: left; }
         .form-group label { display: block; font-size: 12px; font-weight: 700; color: #555; margin-bottom: 4px; }
         .form-group input, .form-group select { width: 100%; padding: 10px; border: 1.5px solid #ddd; border-radius: 6px; font-size: 14px; outline: none; }
-        .form-group input:focus, .form-group select:focus { border-color: #ff9800; }
         .btn-send-withdraw { width: 100%; padding: 10px; background: #e65100; color: white; border: none; border-radius: 6px; font-weight: 700; cursor: pointer; margin-top: 5px; }
 
-        /* Nhiệm vụ */
         .task-card { background: #f8fafc; border: 1.5px solid #e2e8f0; border-left: 4px solid #1a73e8; padding: 14px; border-radius: 8px; margin-bottom: 18px; font-size: 14px; line-height: 1.6; }
         .task-card b.title { color: #1a73e8; display: block; margin-bottom: 6px; font-size: 15px; }
-        .task-step { margin: 4px 0; }
-        code { background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-weight: 700; color: #d946ef; }
+        .btn-start-task { display: block; width: 100%; padding: 10px; background: #0284c7; color: white; border: none; border-radius: 6px; font-weight: 700; text-align: center; text-decoration: none; cursor: pointer; margin-top: 10px; }
+        .btn-start-task:hover { background: #0369a1; }
 
-        /* Nhập mã */
-        input[type="text"].task-input { width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 16px; margin-bottom: 10px; outline: none; text-align: center; font-weight: 600; letter-spacing: 1px; }
-        input[type="text"].task-input:focus { border-color: #1a73e8; }
-        button.btn-submit { width: 100%; padding: 13px; background: #1a73e8; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.2s; }
+        input[type="text"].task-input { width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 16px; margin-bottom: 10px; outline: none; text-align: center; font-weight: 600; }
+        button.btn-submit { width: 100%; padding: 13px; background: #1a73e8; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; }
         button.btn-submit:hover { background: #1557b0; }
 
         #message { margin-top: 12px; text-align: center; font-weight: 700; font-size: 14px; min-height: 20px; }
@@ -51,72 +44,79 @@
     <div class="app-container">
         <div class="header">
             <h2>TRAFFIC CASH</h2>
-            <div class="user-pill">👤 <span id="user-id">user1</span></div>
+            <div class="user-pill">👤 ID: <span id="user-id">Đang tải...</span></div>
         </div>
 
-        <!-- Khung số dư -->
         <div class="balance-box">
-            <p class="balance-title">Số Dư Khả Dụng</p>
+            <p class="balance-title">Số Dư Của Bạn</p>
             <p class="balance-amount"><span id="balance">0</span> đ</p>
             <button class="btn-withdraw-toggle" onclick="toggleWithdraw()">💸 RÚT TIỀN VỀ VÍ</button>
         </div>
 
-        <!-- Khung form điền rút tiền (Mặc định ẩn, bấm nút mới hiện) -->
         <div class="withdraw-form" id="withdraw-section">
             <h4>Yêu Cầu Rút Tiền</h4>
-            
             <div class="form-group">
                 <label>Hình thức nhận tiền:</label>
                 <select id="withdraw-method" onchange="changeMethod()">
                     <option value="MoMo">Ví Điện Tử MoMo</option>
-                    <option value="Ngân Hàng (MB Bank)">MB Bank (Quân Đội)</option>
-                    <option value="Ngân Hàng (Vietcombank)">Vietcombank</option>
-                    <option value="Ngân Hàng (Techcombank)">Techcombank</option>
-                    <option value="Ngân Hàng (VPBank)">VPBank</option>
-                    <option value="Ngân Hàng (BIDV)">BIDV</option>
-                    <option value="Ngân Hàng (Khác)">Ngân hàng khác</option>
+                    <option value="MB Bank">MB Bank (Quân Đội)</option>
+                    <option value="Vietcombank">Vietcombank</option>
+                    <option value="Techcombank">Techcombank</option>
+                    <option value="VPBank">VPBank</option>
+                    <option value="Khác">Ngân hàng khác</option>
                 </select>
             </div>
-
             <div class="form-group">
                 <label id="lbl-acc">Số điện thoại MoMo:</label>
                 <input type="text" id="withdraw-account" placeholder="Ví dụ: 0987654321">
             </div>
-
             <div class="form-group">
                 <label>Tên chủ tài khoản (Viết hoa không dấu):</label>
                 <input type="text" id="withdraw-name" placeholder="Ví dụ: NGUYEN VAN A">
             </div>
-
             <div class="form-group">
-                <label>Số tiền muốn rút (Tối thiểu 1.000đ):</label>
-                <input type="number" id="withdraw-amount" placeholder="Ví dụ: 5000">
+                <label>Số tiền rút (Tối thiểu 1.000đ):</label>
+                <input type="number" id="withdraw-amount" placeholder="Ví dụ: 1000">
             </div>
-
-            <button class="btn-send-withdraw" onclick="sendWithdrawRequest()">GỬI YÊU CẦU RÚT TIỀN</button>
+            <button class="btn-send-withdraw" onclick="sendWithdrawRequest()">XÁC NHẬN RÚT TIỀN</button>
         </div>
 
-        <!-- Nhiệm vụ mẫu -->
         <div class="task-card">
-            <b class="title">📋 Nhiệm vụ hiện có:</b>
-            <div class="task-step"><b>Bước 1:</b> Mở Google tìm: <code>dịch vụ seo uy tín</code></div>
-            <div class="task-step"><b>Bước 2:</b> Vào web: <code>seotop...vn</code> (hoặc bấm vào link web khách)</div>
-            <div class="task-step"><b>Bước 3:</b> Cuộn xuống chân trang, đợi 60s để nhận mã.</div>
+            <b class="title">📋 Nhiệm vụ SEO có sẵn:</b>
+            <div>1. Bấm nút bên dưới để bắt đầu tính giờ làm nhiệm vụ.</div>
+            <div>2. Cuộn đọc bài trên web khách đủ 60 giây để bấm lấy mã.</div>
+            <button class="btn-start-task" onclick="startTask()">▶ BẮT ĐẦU LÀM NHIỆM VỤ NÀY</button>
         </div>
 
-        <!-- Nhập mã nộp -->
-        <input type="text" class="task-input" id="input-code" placeholder="DÁN MÃ VÀO ĐÂY (VD: PASS123456)">
-        <button class="btn-submit" onclick="submitTask()">XÁC NHẬN (+300đ)</button>
+        <input type="text" class="task-input" id="input-code" placeholder="DÁN MÃ NHẬN ĐƯỢC VÀO ĐÂY">
+        <button class="btn-submit" onclick="submitTask()">NHẬN THƯỞNG (+300đ)</button>
 
         <div id="message"></div>
 
         <div class="footer-note">
-            Hệ thống kiếm tiền tự động • <a href="/admin.html" target="_blank">Trang Quản Trị Admin</a>
+            Hệ thống kiếm tiền tự động • <a href="/admin.html" target="_blank">Quản Trị Admin</a>
         </div>
     </div>
 
     <script>
-        // Bật / Tắt bảng rút tiền
+        // TẠO MÃ USER RIÊNG BIỆT CHO MỖI THIẾT BỊ (CHỐNG DÙNG CHUNG TIỀN)
+        let userId = localStorage.getItem('traffic_user_id');
+        if (!userId) {
+            userId = 'U' + Math.floor(10000 + Math.random() * 90000);
+            localStorage.setItem('traffic_user_id', userId);
+        }
+        document.getElementById('user-id').innerText = userId;
+
+        // Tải số dư hiện tại từ máy chủ
+        async function loadBalance() {
+            try {
+                const res = await fetch('/api/user/' + userId);
+                const data = await res.json();
+                document.getElementById('balance').innerText = data.balance.toLocaleString();
+            } catch (e) {}
+        }
+        loadBalance();
+
         function toggleWithdraw() {
             const form = document.getElementById('withdraw-section');
             form.style.display = (form.style.display === 'block') ? 'none' : 'block';
@@ -124,58 +124,32 @@
 
         function changeMethod() {
             const method = document.getElementById('withdraw-method').value;
-            const lbl = document.getElementById('lbl-acc');
-            if (method === 'MoMo') {
-                lbl.innerText = "Số điện thoại MoMo:";
-            } else {
-                lbl.innerText = "Số tài khoản ngân hàng:";
-            }
+            document.getElementById('lbl-acc').innerText = (method === 'MoMo') ? "Số điện thoại MoMo:" : "Số tài khoản ngân hàng:";
         }
 
-        // Gửi yêu cầu rút tiền
-        async function sendWithdrawRequest() {
-            const userId = document.getElementById('user-id').innerText;
-            const method = document.getElementById('withdraw-method').value;
-            const accountNumber = document.getElementById('withdraw-account').value.trim();
-            const accountName = document.getElementById('withdraw-name').value.trim();
-            const amount = document.getElementById('withdraw-amount').value.trim();
-            const msgEl = document.getElementById('message');
-
-            if (!accountNumber || !accountName || !amount) {
-                alert("Vui lòng điền đầy đủ tất cả thông tin!");
-                return;
-            }
-
+        // BẮT ĐẦU NHIỆM VỤ VÀ MỞ WEB KHÁCH
+        async function startTask() {
             try {
-                const res = await fetch('/api/withdraw', {
+                await fetch('/api/start-task', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ userId, method, accountNumber, accountName, amount })
+                    body: JSON.stringify({ userId, campaignId: "SEO_DEMO" })
                 });
-                const data = await res.json();
-
-                if (data.success) {
-                    alert(data.message);
-                    document.getElementById('balance').innerText = data.newBalance;
-                    document.getElementById('withdraw-section').style.display = 'none';
-                    document.getElementById('withdraw-amount').value = '';
-                } else {
-                    alert(data.message);
-                }
+                alert("Đã bắt đầu tính giờ! Đang chuyển bạn sang trang web khách hàng. Hãy cuộn đọc bài để chờ lấy mã.");
+                // Mở web khách hàng trong tab mới kèm userId
+                window.open('/web-khach.html?uid=' + userId, '_blank');
             } catch (err) {
-                alert("Lỗi kết nối khi gửi yêu cầu!");
+                alert("Lỗi kết nối máy chủ!");
             }
         }
 
-        // Xác nhận nộp mã nhận 300đ
+        // NỘP MÃ NHẬN TIỀN
         async function submitTask() {
-            const codeInput = document.getElementById('input-code');
-            const code = codeInput.value.trim();
-            const userId = document.getElementById('user-id').innerText;
+            const code = document.getElementById('input-code').value.trim();
             const msgEl = document.getElementById('message');
 
             if (!code) {
-                msgEl.innerText = "Vui lòng nhập mã trước khi xác nhận!";
+                msgEl.innerText = "Vui lòng nhập mã trước!";
                 msgEl.style.color = "red";
                 return;
             }
@@ -194,15 +168,46 @@
                 if (data.success) {
                     msgEl.innerText = data.message;
                     msgEl.style.color = "#16a34a";
-                    document.getElementById('balance').innerText = data.newBalance;
-                    codeInput.value = '';
+                    document.getElementById('balance').innerText = data.newBalance.toLocaleString();
+                    document.getElementById('input-code').value = '';
                 } else {
                     msgEl.innerText = data.message;
                     msgEl.style.color = "#dc2626";
                 }
             } catch (err) {
-                msgEl.innerText = "Lỗi kết nối máy chủ!";
+                msgEl.innerText = "Lỗi kết nối!";
                 msgEl.style.color = "red";
+            }
+        }
+
+        // RÚT TIỀN
+        async function sendWithdrawRequest() {
+            const method = document.getElementById('withdraw-method').value;
+            const accountNumber = document.getElementById('withdraw-account').value.trim();
+            const accountName = document.getElementById('withdraw-name').value.trim();
+            const amount = document.getElementById('withdraw-amount').value.trim();
+
+            if (!accountNumber || !accountName || !amount) {
+                alert("Vui lòng điền đầy đủ thông tin!");
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/withdraw', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId, method, accountNumber, accountName, amount })
+                });
+                const data = await res.json();
+                alert(data.message);
+
+                if (data.success) {
+                    document.getElementById('balance').innerText = data.newBalance.toLocaleString();
+                    document.getElementById('withdraw-section').style.display = 'none';
+                    document.getElementById('withdraw-amount').value = '';
+                }
+            } catch (err) {
+                alert("Lỗi kết nối khi gửi yêu cầu!");
             }
         }
     </script>
