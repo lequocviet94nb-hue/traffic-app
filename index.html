@@ -27,8 +27,9 @@
 
         .task-card { background: #f8fafc; border: 1.5px solid #e2e8f0; border-left: 4px solid #1a73e8; padding: 14px; border-radius: 8px; margin-bottom: 18px; font-size: 14px; line-height: 1.6; }
         .task-card b.title { color: #1a73e8; display: block; margin-bottom: 6px; font-size: 15px; }
-        .btn-start-task { display: block; width: 100%; padding: 10px; background: #0284c7; color: white; border: none; border-radius: 6px; font-weight: 700; text-align: center; text-decoration: none; cursor: pointer; margin-top: 10px; }
-        .btn-start-task:hover { background: #0369a1; }
+        .task-step { margin: 4px 0; }
+        .btn-start-task { display: block; width: 100%; padding: 12px; background: #16a34a; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; text-align: center; text-decoration: none; cursor: pointer; margin-top: 12px; transition: 0.2s; }
+        .btn-start-task:hover { background: #15803d; }
 
         input[type="text"].task-input { width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 16px; margin-bottom: 10px; outline: none; text-align: center; font-weight: 600; }
         button.btn-submit { width: 100%; padding: 13px; background: #1a73e8; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; }
@@ -82,10 +83,12 @@
         </div>
 
         <div class="task-card">
-            <b class="title">📋 Nhiệm vụ SEO có sẵn:</b>
-            <div>1. Bấm nút bên dưới để bắt đầu tính giờ làm nhiệm vụ.</div>
-            <div>2. Cuộn đọc bài trên web khách đủ 60 giây để bấm lấy mã.</div>
-            <button class="btn-start-task" onclick="startTask()">▶ BẮT ĐẦU LÀM NHIỆM VỤ NÀY</button>
+            <b class="title">📋 Nhiệm vụ vượt link kiếm tiền:</b>
+            <div class="task-step">1. Bấm nút xanh bên dưới để mở liên kết nhiệm vụ.</div>
+            <div class="task-step">2. Chờ 15s – 30s và bấm tiếp tục để vượt link.</div>
+            <div class="task-step">3. Sau khi xong sẽ tự động chuyển đến trang lấy mã.</div>
+            <div class="task-step">4. Copy mã dán vào ô bên dưới để nhận ngay <b>300đ</b>!</div>
+            <button class="btn-start-task" onclick="startTask()">▶ BẮT ĐẦU VƯỢT LINK NHẬN 300Đ</button>
         </div>
 
         <input type="text" class="task-input" id="input-code" placeholder="DÁN MÃ NHẬN ĐƯỢC VÀO ĐÂY">
@@ -99,7 +102,7 @@
     </div>
 
     <script>
-        // TẠO MÃ USER RIÊNG BIỆT CHO MỖI THIẾT BỊ (CHỐNG DÙNG CHUNG TIỀN)
+        // TẠO VÀ LƯU MÃ USER DUY NHẤT
         let userId = localStorage.getItem('traffic_user_id');
         if (!userId) {
             userId = 'U' + Math.floor(10000 + Math.random() * 90000);
@@ -107,7 +110,7 @@
         }
         document.getElementById('user-id').innerText = userId;
 
-        // Tải số dư hiện tại từ máy chủ
+        // Tải số dư thật
         async function loadBalance() {
             try {
                 const res = await fetch('/api/user/' + userId);
@@ -127,17 +130,17 @@
             document.getElementById('lbl-acc').innerText = (method === 'MoMo') ? "Số điện thoại MoMo:" : "Số tài khoản ngân hàng:";
         }
 
-        // BẮT ĐẦU NHIỆM VỤ VÀ MỞ WEB KHÁCH
+        // BẮT ĐẦU NHIỆM VỤ: MỞ LINK RÚT GỌN YEUMONEY CỦA BẠN
         async function startTask() {
             try {
                 await fetch('/api/start-task', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ userId, campaignId: "SEO_DEMO" })
+                    body: JSON.stringify({ userId, campaignId: "YEUMONEY" })
                 });
-                alert("Đã bắt đầu tính giờ! Đang chuyển bạn sang trang web khách hàng. Hãy cuộn đọc bài để chờ lấy mã.");
-                // Mở web khách hàng trong tab mới kèm userId
-                window.open('/web-khach.html?uid=' + userId, '_blank');
+                
+                // MỞ ĐÚNG ĐƯỜNG LINK RÚT GỌN CỦA BẠN ĐỂ BẮT ĐẦU KIẾM TIỀN TỪ YEUMONEY
+                window.open('https://yeumoney.com/6bltFMax', '_blank');
             } catch (err) {
                 alert("Lỗi kết nối máy chủ!");
             }

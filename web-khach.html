@@ -13,9 +13,8 @@
     </style>
 </head>
 <body>
-    <h1>Dịch Vụ SEO & Thiết Kế Website Hàng Đầu</h1>
-    <p>Chào mừng bạn đã đến với bài viết của chúng tôi. Bài viết này chia sẻ các kinh nghiệm thực chiến giúp website tăng trưởng tự nhiên trên Google.</p>
-    <p><i>(Đây là website của khách hàng chi tiền thuê bạn kéo traffic người thật từ Google).</i></p>
+    <h1>Chúc Mừng Bạn Đã Vượt Link Thành Công! 🎉</h1>
+    <p>Bạn đã hoàn thành việc xem liên kết tài trợ. Dưới đây là mã xác nhận phần thưởng của bạn.</p>
 
     <div class="box">
         <p style="font-weight: 600; margin-top: 0;">Cuộn đọc nội dung và đợi đồng hồ chạy hết để nhận mã xác nhận:</p>
@@ -25,11 +24,11 @@
     </div>
 
     <script>
-        // Lấy userId từ đường dẫn (?uid=...)
+        // Lấy userId từ localStorage hoặc URL
         const urlParams = new URLSearchParams(window.location.search);
-        const userId = urlParams.get('uid') || 'GUEST';
+        const userId = localStorage.getItem('traffic_user_id') || urlParams.get('uid') || 'GUEST';
 
-        let timeLeft = 10; // Đặt 10 giây để bạn dễ test
+        let timeLeft = 10;
         let timer = setInterval(() => {
             timeLeft--;
             document.getElementById('timer').innerText = `Chờ: ${timeLeft} giây`;
@@ -45,7 +44,7 @@
                 let res = await fetch('/api/get-code', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ userId: userId, campaignId: "SEO_DEMO" })
+                    body: JSON.stringify({ userId: userId, campaignId: "YEUMONEY" })
                 });
                 let data = await res.json();
                 if (data.success && data.code) {
