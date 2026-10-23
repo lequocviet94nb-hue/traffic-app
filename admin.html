@@ -6,60 +6,60 @@
     <title>Trang Quản Trị Admin - Bảo Mật</title>
     <style>
         * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { background-color: #f1f5f9; margin: 0; padding: 20px; }
-        .container { max-width: 950px; margin: auto; background: white; border-radius: 12px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.06); }
-        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #e2e8f0; padding-bottom: 15px; margin-bottom: 20px; }
-        h1 { margin: 0; font-size: 22px; color: #0f172a; }
+        body { background-color: #0f172a; margin: 0; padding: 20px; color: #f8fafc; }
+        .container { max-width: 1000px; margin: auto; background: #1e293b; border-radius: 14px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid #334155; }
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #334155; padding-bottom: 15px; margin-bottom: 20px; }
+        h1 { margin: 0; font-size: 22px; color: #38bdf8; }
         
-        /* Khung đăng nhập mật khẩu */
         #login-box { text-align: center; padding: 40px 20px; }
-        #login-box input { padding: 12px; border: 2px solid #cbd5e1; border-radius: 6px; font-size: 16px; width: 250px; outline: none; }
-        #login-box button { padding: 12px 20px; background: #0f172a; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        #login-box input { padding: 12px; background: #0f172a; border: 2px solid #475569; border-radius: 6px; font-size: 16px; width: 250px; color: #fff; outline: none; }
+        #login-box button { padding: 12px 20px; background: #2563eb; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
         
         #admin-panel { display: none; }
         .btn-refresh { padding: 8px 16px; background: #0284c7; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
         
         table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th, td { padding: 12px 14px; text-align: left; border-bottom: 1px solid #e2e8f0; font-size: 14px; }
-        th { background: #f8fafc; color: #475569; font-weight: 700; }
+        th, td { padding: 12px 14px; text-align: left; border-bottom: 1px solid #334155; font-size: 13.5px; }
+        th { background: #0f172a; color: #94a3b8; font-weight: 700; }
         
         .badge { padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 700; display: inline-block; }
-        .badge-pending { background: #fef3c7; color: #d97706; }
-        .badge-completed { background: #dcfce7; color: #15803d; }
+        .badge-pending { background: #451a03; color: #f59e0b; }
+        .badge-completed { background: #064e3b; color: #34d399; }
         
-        .btn-pay { background: #16a34a; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; }
-        .btn-pay:hover { background: #15803d; }
-        .empty-msg { text-align: center; color: #94a3b8; padding: 30px; font-size: 15px; }
+        .btn-pay { background: #10b981; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; }
+        .btn-pay:hover { background: #059669; }
+        .empty-msg { text-align: center; color: #64748b; padding: 25px; font-size: 14px; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <!-- KHUNG KHÓA BẢO MẬT ADMIN (CHỐNG NGƯỜI LẠ VÀO DUYỆT TIỀN) -->
+        <!-- KHÓA BẢO MẬT -->
         <div id="login-box">
-            <h2>🔒 KHÓA BẢO MẬT TRANG ADMIN</h2>
-            <p style="color: #64748b;">Vui lòng nhập mật khẩu quản trị để xem danh sách rút tiền:</p>
-            <input type="password" id="admin-pass" placeholder="Mật khẩu mặc định: admin123">
+            <h2>🔒 KHÓA BẢO MẬT QUẢN TRỊ ADMIN</h2>
+            <p style="color: #94a3b8;">Nhập mật khẩu quản trị để duyệt rút tiền:</p>
+            <input type="password" id="admin-pass" placeholder="Mật khẩu: admin123">
             <button onclick="loginAdmin()">MỞ KHÓA</button>
-            <p id="err-msg" style="color: red; font-weight: bold; margin-top: 10px;"></p>
+            <p id="err-msg" style="color: #f87171; font-weight: bold; margin-top: 10px;"></p>
         </div>
 
-        <!-- BẢNG ĐIỀU KHIỂN SAU KHI ĐĂNG NHẬP THÀNH CÔNG -->
+        <!-- BẢNG ĐIỀU KHIỂN -->
         <div id="admin-panel">
             <div class="header">
                 <div>
-                    <h1>👑 BẢNG QUẢN TRỊ ADMIN (ĐÃ BẢO MẬT)</h1>
-                    <p style="margin: 5px 0 0 0; color: #64748b; font-size: 14px;">Quản lý và duyệt tiền cho thợ cày nhiệm vụ</p>
+                    <h1>👑 BẢNG QUẢN TRỊ ADMIN (CHUẨN MONEYTASK)</h1>
+                    <p style="margin: 5px 0 0 0; color: #94a3b8; font-size: 14px;">Quản lý và duyệt tiền cho thợ cày (Min rút: 5.000đ)</p>
                 </div>
-                <button class="btn-refresh" onclick="loadWithdrawals()">🔄 Làm mới</button>
+                <button class="btn-refresh" onclick="loadAdminData()">🔄 Làm mới</button>
             </div>
 
-            <h3>Danh Sách Lệnh Rút Tiền:</h3>
+            <!-- PHẦN 1: DUYỆT RÚT TIỀN -->
+            <h3 style="color: #f59e0b; margin-top: 25px;">💸 Danh Sách Lệnh Rút Tiền (Min 5.000đ):</h3>
             <table>
                 <thead>
                     <tr>
                         <th>Thời gian</th>
-                        <th>ID Thợ Cày</th>
+                        <th>User ID</th>
                         <th>Hình thức</th>
                         <th>Số TK / MoMo</th>
                         <th>Tên người nhận</th>
@@ -68,8 +68,27 @@
                         <th>Thao tác</th>
                     </tr>
                 </thead>
-                <tbody id="table-body">
-                    <tr><td colspan="8" class="empty-msg">Đang tải dữ liệu...</td></tr>
+                <tbody id="withdraw-body">
+                    <tr><td colspan="8" class="empty-msg">Đang tải...</td></tr>
+                </tbody>
+            </table>
+
+            <!-- PHẦN 2: DUYỆT NHIỆM VỤ VIP (GMAIL / MAPS) -->
+            <h3 style="color: #38bdf8; margin-top: 35px;">⭐ Bằng Chứng Nhiệm Vụ VIP (Tạo Gmail / Đánh giá Maps):</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Thời gian</th>
+                        <th>User ID</th>
+                        <th>Loại nhiệm vụ</th>
+                        <th>Nội dung bằng chứng</th>
+                        <th>Thưởng</th>
+                        <th>Trạng thái</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody id="vip-body">
+                    <tr><td colspan="7" class="empty-msg">Chưa có ai gửi bằng chứng VIP.</td></tr>
                 </tbody>
             </table>
         </div>
@@ -82,12 +101,12 @@
             const pass = document.getElementById('admin-pass').value.trim();
             if (!pass) return;
             currentPassword = pass;
-            loadWithdrawals(true);
+            loadAdminData();
         }
 
-        async function loadWithdrawals(isFirstTime = false) {
+        async function loadAdminData() {
             try {
-                const res = await fetch('/api/admin/withdrawals', {
+                const res = await fetch('/api/admin/data', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ password: currentPassword })
@@ -96,44 +115,69 @@
                 const data = await res.json();
 
                 if (!data.success) {
-                    document.getElementById('err-msg').innerText = "Sai mật khẩu Admin!";
+                    document.getElementById('err-msg').innerText = data.message || "Sai mật khẩu Admin!";
                     return;
                 }
 
-                // Đúng mật khẩu -> Hiện bảng
                 document.getElementById('login-box').style.display = 'none';
                 document.getElementById('admin-panel').style.display = 'block';
 
-                const tbody = document.getElementById('table-body');
-                tbody.innerHTML = '';
-
+                // Render Rút tiền
+                const wbody = document.getElementById('withdraw-body');
+                wbody.innerHTML = '';
                 if (!data.withdrawals || data.withdrawals.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="8" class="empty-msg">Chưa có ai gửi yêu cầu rút tiền.</td></tr>';
-                    return;
+                    wbody.innerHTML = '<tr><td colspan="8" class="empty-msg">Chưa có yêu cầu rút tiền nào.</td></tr>';
+                } else {
+                    data.withdrawals.forEach(w => {
+                        const tr = document.createElement('tr');
+                        const isPending = w.status === 'PENDING';
+                        tr.innerHTML = `
+                            <td style="color: #94a3b8; font-size: 12px;">${w.time}</td>
+                            <td><b>${w.userId}</b></td>
+                            <td>${w.method}</td>
+                            <td style="color: #38bdf8; font-family: monospace; font-weight: bold;">${w.accountNumber}</td>
+                            <td style="text-transform: uppercase;"><b>${w.accountName}</b></td>
+                            <td style="color: #f59e0b; font-weight: bold; font-size: 15px;">${w.amount.toLocaleString()} đ</td>
+                            <td>
+                                <span class="badge ${isPending ? 'badge-pending' : 'badge-completed'}">
+                                    ${isPending ? '⏳ Chờ Chuyển Tiền' : '✅ Đã Chuyển Tiền'}
+                                </span>
+                            </td>
+                            <td>
+                                ${isPending ? `<button class="btn-pay" onclick="approveWithdraw('${w.id}')">Đã Bắn Tiền</button>` : '✔️ Hoàn tất'}
+                            </td>
+                        `;
+                        wbody.appendChild(tr);
+                    });
                 }
 
-                data.withdrawals.forEach(w => {
-                    const tr = document.createElement('tr');
-                    const isPending = w.status === 'PENDING';
-
-                    tr.innerHTML = `
-                        <td style="font-size: 12px; color: #64748b;">${w.time}</td>
-                        <td><b>${w.userId}</b></td>
-                        <td><b>${w.method}</b></td>
-                        <td style="color: #2563eb; font-weight: 700; font-family: monospace; font-size: 15px;">${w.accountNumber}</td>
-                        <td style="text-transform: uppercase;"><b>${w.accountName}</b></td>
-                        <td style="color: #dc2626; font-weight: bold; font-size: 15px;">${w.amount.toLocaleString()} đ</td>
-                        <td>
-                            <span class="badge ${isPending ? 'badge-pending' : 'badge-completed'}">
-                                ${isPending ? '⏳ Chờ Chuyển Tiền' : '✅ Đã Chuyển Tiền'}
-                            </span>
-                        </td>
-                        <td>
-                            ${isPending ? `<button class="btn-pay" onclick="approveWithdraw('${w.id}')">Đã Chuyển Tiền Xong</button>` : '✔️ Hoàn tất'}
-                        </td>
-                    `;
-                    tbody.appendChild(tr);
-                });
+                // Render Nhiệm vụ VIP
+                const vbody = document.getElementById('vip-body');
+                vbody.innerHTML = '';
+                if (!data.vipTasks || data.vipTasks.length === 0) {
+                    vbody.innerHTML = '<tr><td colspan="7" class="empty-msg">Chưa có ai gửi bằng chứng nhiệm vụ VIP.</td></tr>';
+                } else {
+                    data.vipTasks.forEach(t => {
+                        const tr = document.createElement('tr');
+                        const isPending = t.status === 'PENDING';
+                        tr.innerHTML = `
+                            <td style="color: #94a3b8; font-size: 12px;">${t.time}</td>
+                            <td><b>${t.userId}</b></td>
+                            <td style="color: #38bdf8;">${t.taskName}</td>
+                            <td style="font-family: monospace; background: #0f172a; padding: 6px; border-radius: 4px;">${t.proof}</td>
+                            <td style="color: #34d399; font-weight: bold;">+${t.reward.toLocaleString()} đ</td>
+                            <td>
+                                <span class="badge ${isPending ? 'badge-pending' : 'badge-completed'}">
+                                    ${isPending ? '⏳ Chờ Duyệt' : '✅ Đã Duyệt'}
+                                </span>
+                            </td>
+                            <td>
+                                ${isPending ? `<button class="btn-pay" onclick="approveVip('${t.id}')">Duyệt & Cộng Tiền</button>` : '✔️ Đã duyệt'}
+                            </td>
+                        `;
+                        vbody.appendChild(tr);
+                    });
+                }
             } catch (err) {
                 console.error(err);
             }
@@ -141,19 +185,26 @@
 
         async function approveWithdraw(id) {
             if (!confirm("Bạn đã mở app MoMo/Ngân hàng bắn tiền cho họ rồi đúng không?")) return;
+            const res = await fetch('/api/admin/approve-withdraw', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password: currentPassword, id })
+            });
+            const data = await res.json();
+            alert(data.message);
+            loadAdminData();
+        }
 
-            try {
-                const res = await fetch('/api/admin/approve', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ password: currentPassword, id })
-                });
-                const data = await res.json();
-                alert(data.message);
-                loadWithdrawals();
-            } catch (err) {
-                alert("Lỗi khi cập nhật!");
-            }
+        async function approveVip(id) {
+            if (!confirm("Bạn đã kiểm tra bằng chứng của họ là hợp lệ rồi đúng không?")) return;
+            const res = await fetch('/api/admin/approve-vip', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password: currentPassword, id })
+            });
+            const data = await res.json();
+            alert(data.message);
+            loadAdminData();
         }
     </script>
 </body>
