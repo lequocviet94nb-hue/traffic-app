@@ -9,10 +9,10 @@ app.use(cors());
 app.use(express.static('public'));
 app.use(express.static(__dirname));
 
-// MẬT KHẨU TRANG QUẢN TRỊ ADMIN (Bạn có thể đổi mật khẩu này theo ý thích)
+// MẬT KHẨU TRANG QUẢN TRỊ ADMIN
 const ADMIN_PASSWORD = "admin123";
 
-// File lưu trữ dữ liệu vĩnh viễn (Chống mất số dư và lịch sử rút tiền khi máy chủ khởi động lại)
+// File lưu trữ dữ liệu vĩnh viễn (Chống mất số dư và lịch sử rút tiền)
 const DATA_FILE = path.join(__dirname, 'data.json');
 
 let db = {
@@ -20,7 +20,7 @@ let db = {
     withdrawals: []   // Danh sách yêu cầu rút tiền
 };
 
-// Tải dữ liệu từ file lên RAM
+// Tải dữ liệu từ file
 function loadData() {
     try {
         if (fs.existsSync(DATA_FILE)) {
@@ -43,79 +43,72 @@ function saveData() {
 
 loadData();
 
-// BỘ NHỚ THEO DÕI CHỐNG GIAN LẬN / CHỐNG TOOL
-let taskSessions = {}; // { "IP_USER": { startTime: timestamp, campaignId: "..." } }
-let activeCodes = {};  // { "PASS123": { userId, expires } }
+// BỘ NHỚ THEO DÕI CHỐNG GIAN LẬN
+let webVisitorTimers = {}; // { "IP": timestamp_bat_dau_vao_web_khach }
+let activeCodes = {};      // { "PASS123": { expires } }
 
-// Helper lấy IP người dùng
+// Helper lấy chuẩn địa chỉ IP người dùng
 function getClientIp(req) {
-    return req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
+    const forwarded = req.headers['x-forwarded-for'];
+    if (forwarded) {
+        return forwarded.split(',')[0].trim();
+    }
+    return req.socket.remoteAddress || 'unknown';
 }
 
-// ==========================================
-// 1. API: BẮT ĐẦU NHIỆM VỤ (Bắt đầu tính giờ 60s)
-// ==========================================
-app.post('/api/start-task', (req, res) => {
-    const { userId, campaignId } = req.body;
+// ========================================================
+// 1. KHI NGƯỜI DÙNG BẮT ĐẦU VÀO WEB KHÁCH (BẮT ĐẦU TÍNH GIỜ)
+// ========================================================
+app.post('/api/web-khach-start', (req, res) => {
     const ip = getClientIp(req);
-    const sessionKey = `${ip}_${userId}`;
-
-    taskSessions[sessionKey] = {
-        userId,
-        campaignId: campaignId || 'DEFAULT',
-        startTime: Date.now()
-    };
-
-    res.json({ success: true, message: "Đã bắt đầu tính giờ làm nhiệm vụ!" });
+    webVisitorTimers[ip] = Date.now();
+    res.json({ success: true });
 });
 
-// ==========================================
-// 2. API: CẤP MÃ (CHỐNG TOOL HACK THỜI GIAN)
-// ==========================================
+// ========================================================
+// 2. KHI HẾT GIỜ BẤM LẤY MÃ (CHỐNG TOOL BẮN LẤY MÃ TỨC THÌ)
+// ========================================================
 app.post('/api/get-code', (req, res) => {
-    const { userId, campaignId } = req.body;
     const ip = getClientIp(req);
-    const sessionKey = `${ip}_${userId}`;
-    const session = taskSessions[sessionKey];
+    const startTime = webVisitorTimers[ip];
 
-    // CHỐNG HACK 1: Phải bấm "Bắt đầu nhiệm vụ" trước
-    if (!session) {
+    // CHỐNG HACK: Nếu chưa mở trang web khách bao giờ mà tự gọi API
+    if (!startTime) {
         return res.status(400).json({ 
             success: false, 
-            message: "Gian lận: Bạn chưa bắt đầu nhiệm vụ hợp lệ từ trang chủ!" 
+            message: "Bạn cần mở trang web và chờ đồng hồ đếm ngược!" 
         });
     }
 
-    // CHỐNG HACK 2: Kiểm tra xem đã ở lại trên trang đủ thời gian chưa (Ví dụ tối thiểu 50 giây)
-    const elapsedSeconds = Math.floor((Date.now() - session.startTime) / 1000);
-    const REQUIRED_TIME = 10; // Đặt 10 giây để bạn test (Sau này có khách thật đổi thành 60 giây)
+    // Kiểm tra thời gian đã ở lại trên trang (Yêu cầu ít nhất 8 giây)
+    const elapsedSeconds = Math.floor((Date.now() - startTime) / 1000);
+    const REQUIRED_TIME = 8; // Đặt 8 giây để người dùng không bị lỗi mạng
 
     if (elapsedSeconds < REQUIRED_TIME) {
         return res.status(400).json({ 
             success: false, 
-            message: `Gian lận: Bạn mới ở lại ${elapsedSeconds}s, chưa đủ ${REQUIRED_TIME}s!` 
+            message: `Bạn chưa đợi đủ thời gian! Vui lòng chờ đồng hồ chạy hết.` 
         });
     }
 
-    // Hợp lệ -> Sinh mã ngẫu nhiên 6 số
+    // Hợp lệ -> Sinh mã 6 số
     const randomCode = "PASS" + Math.floor(100000 + Math.random() * 900000);
     
-    // Mã chỉ dùng được trong 5 phút
+    // Mã có hiệu lực trong 5 phút
     activeCodes[randomCode] = {
-        userId,
         expires: Date.now() + 5 * 60 * 1000
     };
 
-    // Hủy phiên làm việc vừa rồi để chống xin mã nhiều lần
-    delete taskSessions[sessionKey];
+    // Xóa bộ đếm của IP này để tránh xin mã liên tục
+    delete webVisitorTimers[ip];
 
-    console.log(`[+] Cấp mã hợp lệ cho ${userId} (${ip}): ${randomCode}`);
+    console.log(`[+] Cấp mã thành công cho IP ${ip}: ${randomCode}`);
     res.json({ success: true, code: randomCode });
 });
 
-// ==========================================
-// 3. API: NỘP MÃ NHẬN TIỀN
-// ==========================================
+// ========================================================
+// 3. NỘP MÃ NHẬN TIỀN
+// ========================================================
 app.post('/api/submit-code', (req, res) => {
     const { userId, code } = req.body;
 
@@ -130,20 +123,15 @@ app.post('/api/submit-code', (req, res) => {
         return res.json({ success: false, message: "Mã đã quá hạn 5 phút!" });
     }
 
-    // CHỐNG HACK 3: Người nào xin mã thì người đó mới nộp được mã đó
-    if (codeData.userId && codeData.userId !== userId) {
-        return res.json({ success: false, message: "Mã này không phải do bạn tạo ra!" });
-    }
-
-    // Đúng mã -> Hủy mã ngay lập tức (Chống nộp lại lần 2)
+    // Đúng mã -> Hủy mã ngay lập tức (Chống nộp lần 2)
     delete activeCodes[code];
 
     // Cộng 300đ cho người dùng
     if (!db.users[userId]) db.users[userId] = { balance: 0 };
     db.users[userId].balance += 300;
-    saveData(); // Lưu vĩnh viễn
+    saveData(); // Lưu vào file vĩnh viễn
 
-    console.log(`[💰] ${userId} nộp mã đúng (+300đ). Số dư mới: ${db.users[userId].balance}đ`);
+    console.log(`[💰] ${userId} nộp mã đúng (+300đ). Số dư: ${db.users[userId].balance}đ`);
     res.json({ 
         success: true, 
         message: "Chúc mừng! Bạn đã nhận được 300đ", 
@@ -151,18 +139,18 @@ app.post('/api/submit-code', (req, res) => {
     });
 });
 
-// ==========================================
-// 4. API: LẤY SỐ DƯ HIỆN TẠI CỦA USER
-// ==========================================
+// ========================================================
+// 4. LẤY SỐ DƯ NGƯỜI DÙNG
+// ========================================================
 app.get('/api/user/:id', (req, res) => {
     const userId = req.params.id;
     const balance = db.users[userId] ? db.users[userId].balance : 0;
     res.json({ userId, balance });
 });
 
-// ==========================================
-// 5. API: YÊU CẦU RÚT TIỀN (CHỐNG RÚT ÂM TIỀN)
-// ==========================================
+// ========================================================
+// 5. YÊU CẦU RÚT TIỀN (CHỐNG RÚT ÂM)
+// ========================================================
 app.post('/api/withdraw', (req, res) => {
     const { userId, method, accountNumber, accountName, amount } = req.body;
     const withdrawAmount = parseInt(amount);
@@ -173,7 +161,6 @@ app.post('/api/withdraw', (req, res) => {
         return res.json({ success: false, message: "Số tiền rút tối thiểu là 1.000đ!" });
     }
 
-    // CHỐNG HACK 4: Kiểm tra nghiêm ngặt số dư thật trên máy chủ
     if (db.users[userId].balance < withdrawAmount) {
         return res.json({ 
             success: false, 
@@ -182,13 +169,13 @@ app.post('/api/withdraw', (req, res) => {
     }
 
     if (!accountNumber || !accountName) {
-        return res.json({ success: false, message: "Vui lòng nhập đầy đủ thông tin tài khoản!" });
+        return res.json({ success: false, message: "Vui lòng nhập đầy đủ thông tin!" });
     }
 
-    // Trừ số dư an toàn
+    // Trừ số dư
     db.users[userId].balance -= withdrawAmount;
 
-    // Ghi nhận lệnh rút tiền
+    // Ghi nhận lệnh rút
     const newRequest = {
         id: Date.now().toString(),
         userId,
@@ -201,29 +188,25 @@ app.post('/api/withdraw', (req, res) => {
     };
 
     db.withdrawals.unshift(newRequest);
-    saveData(); // Lưu vĩnh viễn vào file
+    saveData();
 
-    console.log(`[💸] Lệnh rút: ${userId} rút ${withdrawAmount}đ (${method}: ${accountNumber})`);
+    console.log(`[💸] Lệnh rút: ${userId} rút ${withdrawAmount}đ qua ${method}`);
     res.json({ 
         success: true, 
-        message: "Yêu cầu rút tiền thành công! Admin sẽ duyệt và bắn tiền sớm.", 
+        message: "Yêu cầu rút tiền thành công! Admin sẽ duyệt sớm.", 
         newBalance: db.users[userId].balance 
     });
 });
 
-// ==========================================
-// 6. API ADMIN: BẢO VỆ BẰNG MẬT KHẨU
-// ==========================================
+// ========================================================
+// 6. ADMIN API (BẢO VỆ BẰNG MẬT KHẨU)
+// ========================================================
 app.post('/api/admin/withdrawals', (req, res) => {
     const { password } = req.body;
     if (password !== ADMIN_PASSWORD) {
         return res.status(403).json({ success: false, message: "Sai mật khẩu Admin!" });
     }
-    res.json({ 
-        success: true, 
-        withdrawals: db.withdrawals, 
-        users: db.users 
-    });
+    res.json({ success: true, withdrawals: db.withdrawals, users: db.users });
 });
 
 app.post('/api/admin/approve', (req, res) => {
@@ -244,5 +227,5 @@ app.post('/api/admin/approve', (req, res) => {
 // Khởi động server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`🚀 Server an toàn đang chạy tại: http://localhost:${PORT}`);
+    console.log(`🚀 Server đang chạy tại: http://localhost:${PORT}`);
 });
